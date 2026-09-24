@@ -14,7 +14,7 @@ const copy={
 };
 function Portrait({toy,large=false,animate=false,pulse=0}:{toy:Toy;large?:boolean;animate?:boolean;pulse?:number}){return <div className={'portrait '+(large?'large':'')} role="img" aria-label={toy.en+' · '+toy.tier} style={{backgroundPosition:`${toy.x}% center`}}>{animate&&<span key={pulse} className="heart-glow" style={{left:toy.heartX+'%',top:toy.heartY+'%'}}><span aria-hidden="true"/></span>}</div>}
 export default function Piloop(){
- const [lang,setLang]=useState<'cs'|'en'>('cs');const t=copy[lang];
+ const lang='en' as 'cs'|'en';const t=copy[lang];
  const [toys,setToys]=useState<Toy[]>([]),[memories,setMemories]=useState<Memory[]>([]),[selected,setSelected]=useState<string|null>('DEMO-BASIC-001'),[tab,setTab]=useState('heart');
  const [loading,setLoading]=useState(true),[error,setError]=useState(''),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[last,setLast]=useState('');
  const [dialog,setDialog]=useState(false),[step,setStep]=useState(1),[key,setKey]=useState(''),[agree,setAgree]=useState(false),[animate,setAnimate]=useState(true);
@@ -22,7 +22,7 @@ export default function Piloop(){
  const pendingMemory=useRef<string|null>(null),inFlight=useRef(false);
  const apply=useCallback((data:{toys:Toy[];memories:Memory[];serverTime:string})=>{setToys(data.toys);setMemories(data.memories);setLast(data.serverTime);setOffset(Date.parse(data.serverTime)-Date.now());setNow(Date.parse(data.serverTime));},[]);
  const load=useCallback(async()=>{try{setError('');const r=await fetch('/api/toys',{cache:'no-store'});if(!r.ok)throw Error();apply(await r.json());}catch{setError('error')}finally{setLoading(false)}},[apply]);
- useEffect(()=>{load();const language=localStorage.getItem('piloop-language');if(language==='en')setLang('en');const motion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;if(motion)setAnimate(false);},[load]);
+ useEffect(()=>{load();const motion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;if(motion)setAnimate(false);},[load]);
  useEffect(()=>{document.documentElement.lang=lang;localStorage.setItem('piloop-language',lang)},[lang]);
  useEffect(()=>{const i=setInterval(()=>setNow(Date.now()+offset),1000);return()=>clearInterval(i)},[offset]);
  useEffect(()=>{const onFocus=()=>{if(!inFlight.current)load()};window.addEventListener('focus',onFocus);return()=>window.removeEventListener('focus',onFocus)},[load]);
@@ -37,7 +37,7 @@ export default function Piloop(){
 
  function choose(x:Toy){setSelected(x.id);setTab('heart');setDraft('');setName(x.name);setMessage('');setError('');pendingMemory.current=null;window.scrollTo({top:0,behavior:'smooth'})}
  return <div className="app-shell">
-  <header className="app-header"><button className="header-collection text-button" onClick={()=>{if(!busy)setSelected(null)}}><Heart size={17}/>{t.collection}</button><button className="logo-button" onClick={()=>{if(!busy)setSelected(null)}} aria-label="PILOOP"><img src="/assets/logo.png" alt="PILOOP More Than a Toy"/></button><div className="language" aria-label="Language"><button aria-pressed={lang==='cs'} onClick={()=>setLang('cs')}>CZ</button><button aria-pressed={lang==='en'} onClick={()=>setLang('en')}>EN</button></div></header>
+  <header className="app-header"><button className="header-collection text-button" onClick={()=>{if(!busy)setSelected(null)}}><Heart size={17}/>{t.collection}</button><button className="logo-button" onClick={()=>{if(!busy)setSelected(null)}} aria-label="PILOOP"><img src="/assets/logo.png" alt="PILOOP More Than a Toy"/></button><span aria-hidden="true"/></header>
   <main>
   {error&&<div className="error" role="alert">{t[error as 'error'|'keyError']} {!dialog&&<button onClick={load} disabled={busy}><RefreshCw size={15}/>{t.retry}</button>}</div>}
   {message&&<div className="success" role="status"><Check size={17}/>{message}</div>}
