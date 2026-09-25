@@ -1,6 +1,6 @@
 'use client';
 import {useCallback,useEffect,useRef,useState} from 'react';
-import {Heart,BookOpen,Sparkles,ArrowLeft,LockKeyhole,RefreshCw,Feather,Check,Volume2,VolumeX} from 'lucide-react';
+import {Heart,BookOpen,Sparkles,ArrowLeft,LockKeyhole,RefreshCw,Feather,Check,Volume2,VolumeX,Scissors} from 'lucide-react';
 import {Tabs,TabsList,TabsTrigger,TabsContent} from '@/components/ui/tabs';
 import {Dialog,DialogContent,DialogTitle,DialogDescription} from '@/components/ui/dialog';
 import {Checkbox} from '@/components/ui/checkbox';
@@ -37,7 +37,7 @@ export default function Piloop(){
 
  function choose(x:Toy){setSelected(x.id);setTab('heart');setDraft('');setName(x.name);setMessage('');setError('');pendingMemory.current=null;window.scrollTo({top:0,behavior:'smooth'})}
  return <div className="app-shell">
-  <header className="app-header"><button className="header-collection text-button" onClick={()=>{if(!busy)setSelected(null)}}><Heart size={17}/>{t.collection}</button><button className="logo-button" onClick={()=>{if(!busy)setSelected(null)}} aria-label="PILOOP"><img src="/assets/logo.png" alt="PILOOP More Than a Toy"/></button><span aria-hidden="true"/></header>
+  <header className="app-header"><button className="header-collection text-button" onClick={()=>{if(!busy)setSelected(null)}}><Heart size={17}/>{t.collection}</button><button className="logo-button" onClick={()=>{if(!busy)setSelected(null)}} aria-label="PILOOP"><img src="/assets/logo.png" alt="PILOOP More Than a Toy"/></button><a className="opencrochet-link" href="https://yarnengine-production.up.railway.app/" target="_blank" rel="noopener noreferrer" aria-label="OpenCrochet Pro" title="OpenCrochet Pro"><Scissors size={21}/><span>OpenCrochet Pro</span></a></header>
   <main>
   {error&&<div className="error" role="alert">{t[error as 'error'|'keyError']} {!dialog&&<button onClick={load} disabled={busy}><RefreshCw size={15}/>{t.retry}</button>}</div>}
   {message&&<div className="success" role="status"><Check size={17}/>{message}</div>}
