@@ -44,3 +44,10 @@
 @keyframes previewDoubleBeat{0%,24%,65%,100%{transform:scale(1)}9%{transform:scale(var(--heart-peak))}46%{transform:scale(var(--heart-second))}}
 @media(max-height:760px){.life-preview-stage{height:174px}.life-preview-knit{width:165px;height:150px}.life-preview-dialog{padding:20px!important;gap:7px!important}.life-preview-dialog [data-slot=dialog-title]{font-size:30px}}
 @media(prefers-reduced-motion:reduce){.life-preview-reduced{display:block}.life-preview-stage[data-state=ended] .life-preview-colour{transform:none}}
+
+
+/* Main-site return is explicit even when the Living Heart is embedded in an iframe. */
+.back-to-piloop{justify-self:end;display:inline-flex;align-items:center;gap:7px;padding:9px 12px;border:1px solid var(--border);border-radius:24px;color:var(--primary);background:#fffdf9;text-decoration:none;font-size:13px;font-weight:800;white-space:nowrap;min-height:42px}
+.back-to-piloop:hover,.footer-return:hover{text-decoration:underline;text-underline-offset:3px}
+.footer-return{display:inline-flex;align-items:center;gap:5px;color:var(--primary);font-weight:700;text-decoration:none;white-space:nowrap}
+@media(max-width:390px){.app-header .logo-button{width:120px;height:72px}.back-to-piloop{font-size:10px;padding:6px 7px;gap:3px;min-height:36px}.back-to-piloop svg{width:13px;height:13px}.app-header{gap:6px}}
