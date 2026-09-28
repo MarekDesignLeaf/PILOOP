@@ -28,3 +28,9 @@ test('Independent saved hearts, protected confirmation, replay safety and memory
  data=await(await GET()).json();assert.equal(data.memories.length,1);assert.equal(data.memories[0].toy_id,id);assert.equal(data.toys[0].name,'Marek’s fox');assert.equal(data.toys[0].genesis_id,first.genesis_id);
  assert.equal((await call({id,action:'memory',text:'x'.repeat(2001),requestId:crypto.randomUUID()})).status,400);
 });
+
+test('Living Heart links return to main PILOOP website from header and footer, including embedded view',()=>{
+ const app=readFileSync('app/piloop.tsx','utf8');
+ assert.equal((app.match(/href="https:\/\/piloop\.co\.uk\/#living-heart" target="_top"/g)||[]).length,2);
+ assert.match(app,/aria-label="Back to the main PILOOP website"/);
+});
