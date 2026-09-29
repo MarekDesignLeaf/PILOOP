@@ -51,3 +51,33 @@
 .back-to-piloop:hover,.footer-return:hover{text-decoration:underline;text-underline-offset:3px}
 .footer-return{display:inline-flex;align-items:center;gap:5px;color:var(--primary);font-weight:700;text-decoration:none;white-space:nowrap}
 @media(max-width:390px){.app-header .logo-button{width:120px;height:72px}.back-to-piloop{font-size:10px;padding:6px 7px;gap:3px;min-height:36px}.back-to-piloop svg{width:13px;height:13px}.app-header{gap:6px}}
+
+
+/* Awaken Heart investor walkthrough: visual references and a simulated NFC read. */
+.activation-guide{margin:0 0 34px;padding:30px;border:1px solid #d9cbbd;border-radius:18px;background:linear-gradient(130deg,#fffaf3 0%,#f4eee7 100%)}
+.activation-guide-heading{display:flex;align-items:start;justify-content:space-between;gap:25px;margin-bottom:24px}
+.activation-guide-heading h2{font-size:clamp(27px,3vw,41px);margin-bottom:10px;color:var(--primary)}
+.activation-guide-heading p{max-width:750px;font-size:14px;line-height:1.65;color:#635c55}
+.demo-pill{display:inline-block;white-space:nowrap;padding:8px 13px;border-radius:30px;background:#e1ecea;color:#25504b;font-size:10px;font-weight:800;letter-spacing:.08em}
+.activation-steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:13px}
+.activation-steps article{min-width:0;border:1px solid #e4d8ca;background:#fff;border-radius:12px;padding:15px}
+.activation-number{display:block;font-size:10px;font-weight:900;letter-spacing:.08em;color:#a45a32;margin-bottom:12px}
+.activation-steps h3{font-size:16px;font-weight:900;margin:13px 0 8px;letter-spacing:-.02em}
+.activation-steps p{font-size:12px;line-height:1.58;color:#645b52;margin:0}
+.activation-art{position:relative;display:flex;align-items:center;justify-content:center;height:145px;border-radius:9px;background:#f6efe8;overflow:hidden}
+.nfc-art{gap:10px;flex-direction:column;color:#31586b}.nfc-art>svg{height:68px}.nfc-art .nfc-symbol{position:absolute;right:15%;top:17%;color:#c06b3e}.nfc-art strong{font-size:11px;letter-spacing:.12em}
+.toy-art{background:#f5ede4}.toy-art img{display:block;width:auto;height:135px;max-width:74%;object-fit:contain}.toy-art .scan-phone{position:absolute;right:2%;bottom:3%;display:flex;flex-direction:column;align-items:center;color:#31586b;filter:drop-shadow(0 2px 2px #ffffff)}
+.toy-art .scan-phone svg:last-child{color:#d1763e;margin-top:-23px}
+.signal-art{flex-direction:column;color:#31586b;gap:3px}.signal-art svg:nth-child(2){position:absolute;right:23%;top:19%;color:#43916f}.signal-art strong{font-size:10px;letter-spacing:.07em}
+.key-art{padding:8px;background:#e3dad0}.sample-card{display:flex;flex-direction:column;gap:4px;width:100%;height:125px;padding:11px;background:#234c60;border-radius:8px;color:#fff;box-shadow:0 6px 12px #10253129}.sample-card span{font-size:8px;font-weight:900;letter-spacing:.09em}.sample-card svg{align-self:end;width:23px;height:23px;color:#e6b38b}.sample-card strong{font-size:9px;letter-spacing:.06em}.sample-card code{font-size:12px;font-weight:900;white-space:nowrap;color:#ffcdab}.sample-card small{font-size:7px;color:#eacdb8}
+.genesis-art{background:radial-gradient(circle,#f6d2c1 0%,#f9eee8 70%);color:#cf7040;gap:3px}.genesis-art span{position:absolute;right:26%;top:17%;font-size:20px;color:#31586b}
+.activation-demo-action{display:flex;gap:18px;align-items:center;flex-wrap:wrap;border-top:1px solid #dfd0c3;margin-top:22px;padding-top:20px}
+.activation-demo-action>div{flex:1 1 280px}.activation-demo-action strong{font-size:16px;color:#264858}.activation-demo-action p{font-size:12px;max-width:580px;color:#655d57;margin:4px 0}
+.activation-demo-action>.primary{display:inline-flex;align-items:center;gap:10px;padding:12px 17px;min-height:47px;max-width:100%;white-space:normal}
+.activation-status{flex-basis:100%;font-size:12px;font-weight:700;color:#27665d}
+.activation-photo-note{margin:13px 0 0;font-size:10px;color:#74675d;line-height:1.5}
+.demo-reset{border:1px solid #b7a79b;background:transparent;border-radius:22px;color:#6a5c51;font-size:11px;padding:7px 12px;cursor:pointer}
+.demo-reset:hover{background:#f0e5d8}
+@media(max-width:1180px){.activation-steps{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:700px){.activation-guide{padding:16px;margin-bottom:22px}.activation-guide-heading{flex-direction:column;gap:8px}.activation-steps{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.activation-steps article{padding:11px}.activation-art{height:123px}.activation-steps h3{font-size:15px}.activation-steps p{font-size:11px}.sample-card{height:110px}.sample-card code{font-size:10px}}
+@media(max-width:390px){.activation-steps{grid-template-columns:1fr}.activation-art{height:145px}.activation-steps p{font-size:12px}}
