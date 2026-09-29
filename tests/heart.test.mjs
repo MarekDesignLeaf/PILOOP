@@ -1,36 +1,56 @@
-import { test } from 'node:test';
+import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import { DatabaseSync } from 'node:sqlite';
-import { readFileSync } from 'node:fs';
-import { build } from 'esbuild';
-const sqlite = new DatabaseSync(':memory:');
-sqlite.exec('PRAGMA foreign_keys=ON');
-sqlite.exec(readFileSync('drizzle/0000_romantic_hydra.sql','utf8'));
-const DB={prepare(sql){let args=[];const query={bind(...values){args=values;return query},async first(){return sqlite.prepare(sql).get(...args)||null},async all(){return {results:sqlite.prepare(sql).all(...args)}},async run(){return sqlite.prepare(sql).run(...args)}};return query},async batch(statements){sqlite.exec('BEGIN');try{const results=[];for(const s of statements)results.push(await s.run());sqlite.exec('COMMIT');return results}catch(e){sqlite.exec('ROLLBACK');throw e}}};
-globalThis.piloopTestEnv={DB};
-const compiled=await build({entryPoints:['app/api/toys/route.ts'],bundle:true,platform:'node',format:'esm',write:false,plugins:[{name:'test-env',setup(b){b.onResolve({filter:/^cloudflare:workers$/},()=>({path:'env',namespace:'test'}));b.onLoad({filter:/.*/,namespace:'test'},()=>({contents:'export const env = globalThis.piloopTestEnv;',loader:'js'}))}}]});
-const {GET,POST}=await import('data:text/javascript;base64,'+Buffer.from(compiled.outputFiles[0].text).toString('base64'));
-const call=(payload,origin='https://piloop.test')=>POST(new Request('https://piloop.test/api/toys',{method:'POST',headers:{origin,'Content-Type':'application/json'},body:JSON.stringify(payload)}));
-test('Independent saved hearts, protected confirmation, replay safety and memory persistence',async()=>{
- let data=await (await GET()).json();assert.equal(data.toys.length,5);assert.ok(data.toys.every(t=>t.awakened_at===null));
- const id=data.toys[0].id;
- assert.equal((await call({id,action:'awaken',key:'wrong',confirmed:true})).status,400);
- assert.equal((await call({id,action:'awaken',key:'PILOOP-DEMO',confirmed:false})).status,400);
- assert.equal((await call({id,action:'awaken',key:'PILOOP-DEMO',confirmed:true},'https://untrusted.test')).status,403);
- assert.equal((await call({id,action:'reset'})).status,400);
- assert.equal((await call({id:'unknown',action:'awaken'})).status,400);
- data=await (await call({id,action:'awaken',key:'PILOOP-DEMO',confirmed:true})).json();
- const first=data.toys[0];assert.ok(first.genesis_id);assert.ok(first.awakened_at);
- data=await (await call({id,action:'awaken',key:'PILOOP-DEMO',confirmed:true})).json();
- assert.equal(data.toys[0].genesis_id,first.genesis_id);assert.equal(data.toys[0].awakened_at,first.awakened_at);assert.equal(data.toys[1].awakened_at,null);
- const requestId=crypto.randomUUID();await call({id,action:'memory',text:'Our first day',requestId});await call({id,action:'memory',text:'Our first day',requestId});
- await call({id,action:'name',name:'Marek’s fox'});
- data=await(await GET()).json();assert.equal(data.memories.length,1);assert.equal(data.memories[0].toy_id,id);assert.equal(data.toys[0].name,'Marek’s fox');assert.equal(data.toys[0].genesis_id,first.genesis_id);
- assert.equal((await call({id,action:'memory',text:'x'.repeat(2001),requestId:crypto.randomUUID()})).status,400);
-});
+import {readFileSync} from 'node:fs';
+import {build} from 'esbuild';
+import {randomUUID} from 'node:crypto';
 
-test('Living Heart links return to main PILOOP website from header and footer, including embedded view',()=>{
+async function bundle(path) {
+ const result=await build({entryPoints:[path],bundle:true,platform:'node',format:'esm',write:false});
+ return import('data:text/javascript;base64,'+Buffer.from(result.outputFiles[0].text).toString('base64'));
+}
+const {DEMO_STORAGE_KEY,freshDemo,readDemo,saveDemo,updateDemo}=await bundle('lib/demo-session.ts');
+const {GET,POST}=await bundle('app/api/toys/route.ts');
+function storage(){const map=new Map();return {getItem:k=>map.get(k)??null,setItem:(k,v)=>map.set(k,v),removeItem:k=>map.delete(k)}}
+
+test('every visitor gets independent fictional hearts and original Genesis remains immutable',()=>{
+ const a=storage(), b=storage();
+ assert.equal(readDemo(a).toys.length,5);
+ assert.equal(readDemo(b).toys[0].awakened_at,null);
+ const current=readDemo(a),id=current.toys[0].id;
+ assert.throws(()=>updateDemo(current,{id,action:'awaken',key:'wrong',confirmed:true}),/key/);
+ assert.throws(()=>updateDemo(current,{id,action:'awaken',key:'PILOOP-DEMO',confirmed:false}),/key/);
+ const first=updateDemo(current,{id,action:'awaken',key:'PILOOP-DEMO',confirmed:true},'2026-09-29T00:00:00.000Z',randomUUID());
+ assert.ok(first.toys[0].genesis_id);saveDemo(a,first);
+ const repeat=updateDemo(readDemo(a),{id,action:'awaken',key:'PILOOP-DEMO',confirmed:true},'2026-09-29T00:00:11.000Z',randomUUID());
+ assert.equal(repeat.toys[0].genesis_id,first.toys[0].genesis_id);
+ assert.equal(repeat.toys[0].awakened_at,first.toys[0].awakened_at);
+ assert.equal(readDemo(b).toys[0].awakened_at,null);
+ const saved=updateDemo(first,{id,action:'name',name:'Sample Fox'}); saveDemo(a,saved);
+ assert.equal(readDemo(a).toys[0].name,'Sample Fox'); assert.equal(readDemo(b).toys[0].name,'');
+ const memoryId=randomUUID(), message=updateDemo(saved,{id,action:'memory',text:'A fictional memory',requestId:memoryId});
+ const duplicate=updateDemo(message,{id,action:'memory',text:'A fictional memory',requestId:memoryId});
+ assert.equal(duplicate.memories.length,1);
+ a.removeItem(DEMO_STORAGE_KEY);assert.equal(readDemo(a).toys[0].genesis_id,null);
+});
+test('shared legacy database endpoint cannot expose or alter visitor histories',async()=>{
+ const seed=await(await GET()).json();
+ assert.equal(seed.toys.length,5);assert.ok(seed.toys.every(x=>x.awakened_at===null));
+ assert.equal(seed.memories.length,0);
+ assert.equal((await POST()).status,403);
+});
+test('visual instructions include NFC approach, fictional activation card and automatic key dialog',()=>{
+ const guide=readFileSync('app/activation-guide.tsx','utf8'), app=readFileSync('app/piloop.tsx','utf8');
+ for(const step of ['Switch on NFC','Approach the PILOOP','Automatic popup','Enter the card key','Confirm the first beat'])assert.ok(guide.includes(step),step);
+ assert.ok(guide.includes('/assets/characters/DEMO-BASIC-001.png'));
+ assert.ok(guide.includes('PILOOP-DEMO'));
+ assert.match(app,/setTimeout\(\(\)=>\{setScan\('detected'\);setStep\(1\);setKey\(''\);setAgree\(false\);setError\(''\);setDialog\(true\)/);
+ assert.ok(app.includes('<ActivationGuide onCapture={simulateDetection}'));
+ assert.ok(app.includes('restartDemo'));
+});
+test('Living Heart opens independently from main PILOOP and never inherits OpenCrochet account',()=>{
  const app=readFileSync('app/piloop.tsx','utf8');
  assert.equal((app.match(/href="https:\/\/piloop\.co\.uk\/#living-heart" target="_top"/g)||[]).length,2);
  assert.match(app,/aria-label="Back to the main PILOOP website"/);
+ assert.ok(!app.includes('fetch(\'/api/toys\''));
+ assert.ok(app.includes('readDemo(window.localStorage)'));
 });
