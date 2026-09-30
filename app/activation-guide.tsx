@@ -11,6 +11,9 @@ export function ActivationGuide({ onCapture, scan, living }: {
         <p>Follow the same intended order as the physical PILOOP activation. This online version uses a simulated NFC signal and fictional product details only.</p></div>
       <span className="demo-pill">INTERACTIVE DEMONSTRATION</span>
     </div>
+    <figure className="activation-overview" style={{margin:'0 0 24px',border:'1px solid #d9cbbd',borderRadius:14,overflow:'hidden',background:'#fffaf3'}}>
+      <img src="/assets/awaken-heart.jpg" alt="Awaken Heart guide: turn on NFC, bring your phone close to your PILOOP, tap Continue, enter the activation key from the product card, and your PILOOP is alive" loading="lazy" style={{display:'block',width:'100%',height:'auto'}}/>
+    </figure>
     <div className="activation-steps">
       <article><span className="activation-number">01 / PREPARE</span>
         <div className="activation-art nfc-art" aria-hidden="true"><Smartphone size={66} strokeWidth={1.4}/><span className="nfc-symbol"><Radio size={28}/></span><strong>NFC ON</strong></div>
